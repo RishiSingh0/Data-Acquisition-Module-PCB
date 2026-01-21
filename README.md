@@ -13,11 +13,17 @@ Some of the sensor's I²C bus was unreliable over the long cable run because I²
 # Layout
 The 50mm x 50mm PCB presented placement challenges due to two key components: an antenna on the top layer and an SD card on the bottom layer. The board dimensions were constrained by the enclosure size. Design requirements included maintaining clear space below both the antenna (to ensure optimal Bluetooth performance for future project cycles) and the SD card component. The SD card provides local data storage for extended testing periods, eliminating concerns about the microcontroller's limited storage capacity.
 
-Front: 
-![A screenshot of the schematic](assets/Front.png)
+Front Prototype assembled: 
+![Fully assembled PCB front side](assets/front.png)
 
-Back: 
-![A screenshot of the schematic](assets/Back.png)
+Back Prototype assembled: 
+![Fully assembled PCB back side](assets/back.png)
+
+Front PCB: 
+![PCB front side pre assembly](assets/frontb.png)
+
+Back PCB: 
+![PCB back side pre assembly](assets/backb.png)
 
 # 4 Layer Design
 A four-layer board was initially considered, but concerns arose about high-speed signal integrity due to the numerous signals routed to surface-mounted pins and potential trace interference. To ensure reliable performance, a six-layer board was ultimately selected, providing better isolation between different ground planes and signal layers.
