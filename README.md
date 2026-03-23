@@ -87,19 +87,34 @@ Connectors were pre-positioned to align geographically with the power board, fur
 ### JTAG Programming Failure (Error -102)
 **Problem:** The prototype failed to program via JTAG — the J-Link reported error -102 (cannot reliably communicate with the chip), indicating a hardware connectivity issue.
 
-**Status:** Under investigation. Root causes include potential solder joint quality, signal integrity on JTAG traces, and power supply stability. See the full [JTAG Debug Report](docs/JTAG_Debug_Report.md) for details.
+**Root cause identified:** CLK and DIO lines were swapped in the schematic/layout. Next step is to swap the connections and verify whether the board programs successfully.
+
+See the full [JTAG Debug Report](docs/JTAG_Debug_Report.md) for details.
 
 ## Project Status
 
+### Prototype V1
 - [x] Schematic design
 - [x] 6-layer PCB layout
 - [x] PCB fabrication (JLCPCB)
 - [x] Component sourcing
 - [x] Prototype V1 hand assembly
-- [ ] Resolve JTAG programming error (-102)
+- [x] Root cause identified: CLK/DIO lines swapped
+- [ ] Swap CLK/DIO connections and verify JTAG programming
 - [ ] Verify hardware with blinky LED test
 - [ ] Flash full sensor acquisition firmware
 - [ ] System integration testing on submarine
+
+### V2 Redesign (Planned)
+Redesigning the board based on mentor feedback with the following additions:
+- [ ] Replace power management with **nPM1300** (battery charging + power path)
+- [ ] Add USB connector for power and data
+- [ ] Swap JTAG for **SWD** debug interface
+- [ ] Add **UART** debugger interface
+- [ ] Add **NAND flash** memory for expanded storage
+- [ ] Add **EEPROM** for configuration/calibration storage
+- [ ] Integrate sensors directly onto the board
+- [ ] Updated schematic and layout
 
 ## Repository Structure
 
