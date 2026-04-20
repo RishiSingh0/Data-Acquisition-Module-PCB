@@ -2,7 +2,9 @@
 
 6-layer, 50mm x 50mm PCB designed to collect and log real-time sensor data aboard a human-powered submarine.
 
-![Fully assembled PCB front side — Prototype V1](assets/front.png)
+**Status: V1 archived.** This is the first spin of the SUBC data acquisition module. It's kept here for reference. V2 is a ground-up redesign, not a rework of this board; see the V2 section below for what changed and why.
+
+![Fully assembled PCB front side, Prototype V1](assets/front.png)
 
 ## Overview
 
@@ -41,7 +43,7 @@ The board went through three design iterations to address signal integrity and r
 The initial design used a standard 2-layer stackup. The high number of traces and high-speed signal requirements quickly exceeded what two layers could reliably support.
 
 ### 4-Layer (Revised)
-A four-layer board improved routing flexibility, but concerns remained about signal isolation — particularly with numerous high-speed signals routed to surface-mount pads and potential trace interference.
+A four-layer board improved routing flexibility, but concerns remained about signal isolation, particularly with numerous high-speed signals routed to surface-mount pads and potential trace interference.
 
 ### 6-Layer (Final)
 The final 6-layer design provides proper ground plane isolation between signal layers, adequate routing channels around constrained components (antenna, SD card, connectors), and reliable high-speed signal integrity.
@@ -55,13 +57,13 @@ The 50mm x 50mm board dimensions were constrained by the submarine enclosure. Tw
 
 Connectors were pre-positioned to align geographically with the power board, further constraining component placement. The 6-layer stackup was essential to route around these restrictions.
 
-### PCB — Pre-Assembly
+### PCB, Pre-Assembly
 
 | Front | Back |
 |-------|------|
 | ![PCB front side](assets/frontb.png) | ![PCB back side](assets/backb.png) |
 
-### Prototype V1 — Assembled
+### Prototype V1, Assembled
 
 | Front | Back |
 |-------|------|
@@ -85,36 +87,34 @@ Connectors were pre-positioned to align geographically with the power board, fur
 **Solution:** A solder paste stencil was ordered to improve consistency. Professional assembly service (JLCPCB) is also being evaluated to eliminate manual soldering errors entirely.
 
 ### JTAG Programming Failure (Error -102)
-**Problem:** The prototype failed to program via JTAG — the J-Link reported error -102 (cannot reliably communicate with the chip), indicating a hardware connectivity issue.
+**Problem:** The prototype failed to program via JTAG. The J-Link reported error -102, which means the programmer couldn't reliably communicate with the chip. That points at a hardware connectivity issue rather than a firmware or device defect.
 
-**Root cause identified:** CLK and DIO lines were swapped in the schematic/layout. Next step is to swap the connections and verify whether the board programs successfully.
+**Root cause:** CLK and DIO lines were swapped in the schematic, which carried through into the layout. V1 was not reworked to swap them back. The finding carried forward into V2, which moves to SWD and cross-checks the debug pinout against the programmer reference on both the schematic and the layout before fab.
 
-See the full [JTAG Debug Report](docs/JTAG_Debug_Report.md) for details.
+See the full [JTAG Debug Report](docs/JTAG_Debug_Report.md) for the debug trail.
 
 ## Project Status
 
-### Prototype V1
-- [x] Schematic design
-- [x] 6-layer PCB layout
-- [x] PCB fabrication (JLCPCB)
-- [x] Component sourcing
-- [x] Prototype V1 hand assembly
-- [x] Root cause identified: CLK/DIO lines swapped
-- [ ] Swap CLK/DIO connections and verify JTAG programming
-- [ ] Verify hardware with blinky LED test
-- [ ] Flash full sensor acquisition firmware
-- [ ] System integration testing on submarine
+### Prototype V1 (archived)
 
-### V2 Redesign (Planned)
-Redesigning the board based on mentor feedback with the following additions:
-- [ ] Replace power management with **nPM1300** (battery charging + power path)
-- [ ] Add USB connector for power and data
-- [ ] Swap JTAG for **SWD** debug interface
-- [ ] Add **UART** debugger interface
-- [ ] Add **NAND flash** memory for expanded storage
-- [ ] Add **EEPROM** for configuration/calibration storage
-- [ ] Integrate sensors directly onto the board
-- [ ] Updated schematic and layout
+- [x] Schematic and 6-layer PCB layout
+- [x] Fabrication (JLCPCB) and component sourcing
+- [x] Hand assembly with solder paste stencil, including the BGA MCU
+- [x] Bring-up to the JTAG stage, root-caused to the CLK/DIO pin swap
+
+V1 never got to a working blinky. The JTAG pinout error, combined with a broader rethink of how power should live on this board (see V2), made a rework unattractive. V1 was closed out here as a prototype learning exercise and the findings rolled forward into V2.
+
+### V2 Redesign
+
+V2 is a ground-up redesign, not a patch of V1. Three things from V1 drive the new design, and the full write-up lives in the V2 repo:
+
+1. **JTAG pinout error.** V2 moves to SWD, which drops the pin count, and the debug pinout gets cross-checked against the programmer reference on both the schematic and the layout before fab.
+
+2. **Power was off-board in V1.** A separate analog power board fed pre-regulated rails into the DAQ through the external connectors, so every rail on this logic board came in over an inter-board connector and the board had no power intelligence of its own. V2 consolidates power onto the motherboard around Nordic's **nPM1300** PMIC, which packs USB charging, battery power path, system rails, and fuel gauging into one IC designed to pair with the nRF52. USB-C goes on the motherboard directly.
+
+3. **Hall-effect sensing was on the motherboard in V1.** Running an analog sensing chain next to a switching logic board is fine on its own, but once the sub is integrated, motor and power-stage noise couples into that chain. V2 spins the hall-effect sensing out onto a dedicated daughter board with its own op-amp front end and a 4–20 mA current loop for noise-immune long cable runs, so the sensing path is physically and electrically isolated from the logic board.
+
+Alongside those three, V2 also picks up USB for power and data, a UART debug interface, NAND flash for expanded logging, EEPROM for calibration storage, and sensors integrated directly on the board.
 
 ## Repository Structure
 
